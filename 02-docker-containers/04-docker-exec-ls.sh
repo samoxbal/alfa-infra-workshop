@@ -2,4 +2,4 @@
 
 set -x
 
-docker exec nginx-alpine ls -l /var
+docker exec nginx-alpine ls -l /var/log/nginx

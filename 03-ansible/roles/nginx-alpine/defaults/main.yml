@@ -1,0 +1,3 @@
+nginx_alpine_image_name: nginx-alpine
+nginx_alpine_image_tag: 0.0.1
+nginx_alpine_container_name: nginx-alpine
