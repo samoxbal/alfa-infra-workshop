@@ -17,8 +17,8 @@ $ brew cask install docker
 $ brew install ansible
 ```
 
-### Python 3
+### Docker-py
 
 ```bash
-$ brew install python3
+$ pip install docker-py
 ```
