@@ -1,22 +1,24 @@
 - name: Build docker image
   docker_image:
-    path: {{ role_path }}
-    name: {{ nginx_alpine_image_name }}
-    tag: {{ nginx_alpine_image_tag }}
+    path: "{{ role_path }}"
+    name: "{{ nginx_alpine_image_name }}"
+    tag: "{{ nginx_alpine_image_tag }}"
 
 - name: Run container
   docker_container:
-    name: {{ nginx_alpine_container_name }}
-    image: "{{ nginx_alpine_image_name }}/{{ nginx_alpine_image_tag }}"
+    name: "{{ nginx_alpine_container_name }}"
+    image: "{{ nginx_alpine_image_name }}:{{ nginx_alpine_image_tag }}"
     ports:
       - "8000:80"
 
 - name: Execute command on container
   docker_container:
-    name: {{ nginx_alpine_container_name }}
-    command: docker inspect {{ nginx_alpine_container_name }}
+    name: "{{ nginx_alpine_container_name }}"
+    image: "{{ nginx_alpine_image_name }}:{{ nginx_alpine_image_tag }}"
+    recreate: no
+    command: cat /var/log/nginx/access.log
 
 - name: Stop and remove container
   docker_container:
-    name: {{ nginx_alpine_container_name }}
+    name: "{{ nginx_alpine_container_name }}"
     state: absent
