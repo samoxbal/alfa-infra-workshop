@@ -1,6 +1,6 @@
 Run
 ===
 ```
-ansible-playbook playbook.yml -i 'localhost' -vv
+ansible-playbook play-nginx.yml -i 'localhost' -vv
 ```
 
