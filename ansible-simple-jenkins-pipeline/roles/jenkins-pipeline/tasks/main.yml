@@ -1,0 +1,88 @@
+---
+# tasks file for jenkins-pipeline
+
+# 2.60.3
+
+- name: Install dependency (docker-py)
+  become: true
+  pip:
+    name: docker-py
+    state: latest
+    # extra_args: --user
+
+- name: build
+  command: >
+    docker build . -t jenkins_with_plugins
+
+# - name: uid
+#   command: >
+#     id -u
+#   register: uid
+#   ignore_errors: true
+
+- name: Create directories for jenkins data
+  become: true
+  file:
+    path: "{{ jenkins_data_dir }}"
+    state: directory
+    mode: 0777
+    owner: "{{ jenkins_uid }}"
+    group: "{{ jenkins_uid }}"
+
+# owner: "{{ uid.stdout }}"
+# group: "{{ uid.stdout }}"
+
+- name: Start Jenkins container
+  docker_container:
+    name: "jenkins-{{ jenkins_name }}"
+    # image: "jenkins:2.60.3"
+    image: "jenkins_with_plugins:latest"
+    hostname: "jenkins-{{ jenkins_name }}"
+    restart_policy: always
+    ports:
+      - "{{ jenkins_port }}:8080"
+    volumes:
+      - "/etc/hosts:/etc/hosts:ro"
+      - "{{ jenkins_data_dir }}:/var/jenkins_home:z"
+  register: status_container
+
+# user: "{{uid.stdout}}"
+
+# - name: Start jenkins master docker container
+#   sudo: yes
+#   command: >
+#     docker run --detach
+#     -p {{jenkins_port}}:8080
+#     --restart always
+#     --hostname="{{jenkins_name}}"
+#     --volume /etc/hosts:/etc/hosts:ro
+#     --volume {{jenkins_data_dir}}:/var/jenkins_home:z
+#     --name jenkins-{{ jenkins_name }} jenkins:2.60.3
+
+- name: pwd
+  command: >
+    cat {{ jenkins_data_dir }}/secrets/initialAdminPassword
+  register: cat_out
+  ignore_errors: true
+
+- debug:
+    msg: "Password is {{cat_out.stdout}}"
+  ignore_errors: true
+
+- name: Copy plugins
+  command: >
+    docker cp plugins.txt jenkins-{{ jenkins_name }}:/usr/share/jenkins/ref/plugins.txt
+
+# - name: Install official plugins
+#   become: true
+#   command: >
+#     docker exec jenkins-{{ jenkins_name }} /usr/local/bin/install-plugins.sh /usr/share/jenkins/ref/plugins.txt
+#   ignore_errors: true
+#   tags: install_plugins
+#
+# - name: Restart Jenkins container
+#   docker_container:
+#       name: "jenkins-{{ jenkins_name }}"
+#       state: started
+#       restart: true
+#   tags: install_plugins
