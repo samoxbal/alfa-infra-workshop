@@ -1,0 +1,9 @@
+- hosts: localhost
+  connection: local
+  vars:
+   jenkins_name: "jenkins-pipeline"
+   jenkins_data_dir: /tmp/jenkins/
+   jenkins_port: 8080
+   jenkins_uid: 1000
+  roles:
+    - jenkins-pipeline
